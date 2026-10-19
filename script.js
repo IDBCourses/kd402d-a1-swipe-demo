@@ -21,12 +21,13 @@
 // ---------- Settings ----------
 // Settings variables should contain all of the "fixed" parts of your programs
 // For example: which key does what, which notes you can play, the tempo.
-const exampleKey = "a"; // the key that plays the example note
-const exampleNote = "C4"; // the note it plays
+const row = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"];
 
 // ---------- State ----------
 // State variables are the parts of your program that change over time.
 // For example: which octave you're playing in, or whether a drone is on.
+let prevKey = null;
+let swipeArray = [];
 
 // ---------- Sound ----------
 // Make the instruments and plug them into the speakers.
@@ -53,24 +54,35 @@ function keyDown(event) {
 
   // Holding a key down sends keydown again and again. Only react to the first one.
   if (event.repeat === false) {
-    console.log("Key down:", event.key);
+    // Check to see whether the current key pressed is beside the previous one.
+    if (prevKey !== null) {
+      let currentIndex = row.indexOf(event.key);
+      let prevIndex = row.indexOf(prevKey);
 
-    // Example: replace this with your own instrument.
-    if (event.key === exampleKey) {
-      synth.triggerAttack(exampleNote, Tone.now()); // keeps sounding until triggerRelease
+      let direction = currentIndex - prevIndex;
+
+      if (swipeArray[swipeArray.length - 1] === direction) {
+        swipeArray.push(direction);
+      } else {
+        swipeArray = [direction];
+      }
+
+      if (direction === -1) {
+        console.log("Swiped Left for " + swipeArray.length + " keys.");
+      } else if (direction === 1) {
+        console.log("Swiped Right for " + swipeArray.length + " keys.");
+      } else {
+        console.log("No Swipe");
+      }
     }
+
+    prevKey = event.key;
+    console.log("Key down:", event.key);
   }
 }
 
 // Runs every time a key comes up.
-function keyUp(event) {
-  console.log("Key up:", event.key);
-
-  // Example: replace this with your own instrument.
-  if (event.key === exampleKey) {
-    synth.triggerRelease(exampleNote, Tone.now());
-  }
-}
+function keyUp(event) {}
 
 // ---------- Setup ----------
 // Setup is run once, at the start of the program. It sets everything up for us!
